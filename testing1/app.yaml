@@ -1,0 +1,13 @@
+runtime: python37
+
+instance_class: B8
+basic_scaling:
+  max_instances: 20
+  idle_timeout: 20m
+
+handlers:
+# Matches requests to /images/... to files in static/images/...
+- url: /.*
+  secure: always
+  redirect_http_response_code: 301
+  script: auto
