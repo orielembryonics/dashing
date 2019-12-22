@@ -21,9 +21,8 @@ import gcsfs
 import socket
 import psycopg2
 
-import get_metrics
+from get_metrics import create_metrics_df, creating_conf_fig, create_ROC_graph
 
-global metrics_df
 
 #######################################################################
 max_rows=10
@@ -162,10 +161,10 @@ app.layout = html.Div([
      Output('model_show_drop_down', 'options')],
     [Input('mult_model_drop_down', 'value'),
      Input('slider', 'value')])
-def update_output(models_selected,slider_value):
+def update_output(models_selected, slider_value):
     if models_selected:
         query = 'SELECT * FROM "Fact_Model_Results" WHERE "model_id" IN ({});'.format(','.join(models_selected))
-        metrics_df = create_metrics_df(models_selected, conn,query)
+        metrics_df = create_metrics_df(models_selected, query)
         return 'You have selected model/s "{}"'.format(models_selected),\
             create_ROC_graph(models_selected,metrics_df),\
             'Selected threshold value = {}'.format(slider_value), \
@@ -178,83 +177,12 @@ def update_output(models_selected,slider_value):
     [Input('model_show_drop_down', 'value'),
      Input('slider', 'value')])
 def update_output(selected_model, slider_value):
-    query = 'SELECT * FROM "Fact_Model_Results" WHERE "model_id" IN ({});'.format(','.join(selected_model))
-    metrics_df = create_metrics_df(selected_model, conn, query)
+    query = 'SELECT model_id ,embryo_id,prediction_type,prediction_value FROM "Fact_Model_Results" WHERE "model_id" IN ({});'.format(','.join(selected_model))
+    metrics_df = create_metrics_df(selected_model, query)
     return creating_conf_fig(slider_value, metrics_df, selected_model)
 
 #######################################################################
-#
-#       creating table based on chosen models
-#
-def creating_conf_fig(value,df,selected_model):
-    dff = create_conf_mat(df, value, selected_model)
-    z =  dff.values.T.tolist()
-    x =  dff.index.tolist()
-    y = dff.columns.tolist()
-    z_text = [['tp = {}'.format(z[0][0]), 'fn = {}'.format(z[0][1])],
-              ['fp = {}'.format(z[1][0]), 'tn = {}'.format(z[1][1])]]
-    fig = ff.create_annotated_heatmap(z, x=x, y=y, annotation_text=z_text,
-                                       colorscale='Viridis', reversescale=True)
-    fig['layout']['yaxis']['autorange'] = "reversed"
-    return fig
-#######################################################################
-def create_conf_mat (df,thresh,model):
-    out_df = df.loc[df['threshs'] == thresh, ['model_id', 'tp', 'tn', 'fp', 'fn']]
-    out_df = out_df.loc[out_df['model_id'] == str(model)]
-    d = {'P': [int(out_df['tp']),
-               int(out_df['fn'])],
-         'N': [int(out_df['fp']),
-               int(out_df['tn'])]}
-    conf_mat = pd.DataFrame(data=d,index=['P', 'N'])
-    return conf_mat
-#######################################################################
-#
-#       creating table based on chosen models
-#
-def create_metrics_df(value,conn,query):
-    if value:
-        try:
-            c2 = conn.cursor()
-            c2.execute(query)
-            df = pd.DataFrame(data=c2.fetchall(), columns=[desc[0] for desc in c2.description])
-            c2.close()
-            #####
-            gt = np.random.rand(1, df.count(axis='rows')[1])
-            #####
-            df.insert(4, 'gt', gt.T)
-            metrics_df=get_metrics.metrics(df)
-        except socket.herror:
-            print(u"Unknown host")
-    return metrics_df
-#######################################################################
-#
-#       func ROC graph
-#
-def create_ROC_graph(value,df):
-    return({
-         'data': [
-             dict(
-                 x=df[df['model_id'] == i]['fpr'],
-                 y=df[df['model_id'] == i]['tpr'],
-                 text=['acc', df[df['model_id'] == i]['acc']],
-                 mode='line',
-                 opacity=0.7,
-                 marker={
-                     'size': 30,
-                     'line': {'width': 0.5, 'color': 'white'}
-                 },
-                 name=i
-             ) for i in value
-         ],
-         'layout': dict(
-             xaxis={'title': 'fpr'},
-             yaxis={'title': 'tpr'},
-             margin={'l': 40, 'b': 40, 't': 10, 'r': 10},
-             legend={'x': 0, 'y': 1},
-             hovermode='closest'
-         )
-    })
-#######################################################################
+
 if __name__ == '__main__':
     app.run_server(debug=True)
     #app.run_server(dev_tools_hot_reload=False)
