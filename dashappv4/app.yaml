@@ -1,0 +1,10 @@
+runtime: python37
+
+instance_class: B8
+
+handlers:
+# Matches requests to /images/... to files in static/images/...
+- url: /.*
+  secure: always
+  redirect_http_response_code: 301
+  script: auto
