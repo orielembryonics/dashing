@@ -10,7 +10,7 @@ runtime_config:
 # for production use. For more information, see:
 # https://cloud.google.com/appengine/docs/flexible/python/configuring-your-app-with-app-yaml
 manual_scaling:
-  instances: 2
+  instances: 4
 resources:
   cpu: 10
   memory_gb: 64
