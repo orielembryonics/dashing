@@ -14,7 +14,7 @@ manual_scaling:
 resources:
   cpu: 10
   memory_gb: 64
-  disk_size_gb: 20
+  disk_size_gb: 30
 
 readiness_check:
   path: "/readiness_check"
