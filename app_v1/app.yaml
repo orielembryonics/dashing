@@ -2,7 +2,7 @@ runtime: python
 env: flex
 entrypoint: gunicorn -b :$PORT main:server
 
-service: Version-1-0
+service: Version1
 
 runtime_config:
   python_version: 3
