@@ -20,8 +20,8 @@ resources:
 
 readiness_check:
   path: "/readiness_check"
-  check_interval_sec: 4
-  timeout_sec: 120
+  check_interval_sec: 104
+  timeout_sec: 100
   failure_threshold: 2
   success_threshold: 1
   app_start_timeout_sec: 300
