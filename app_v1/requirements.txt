@@ -64,4 +64,4 @@ WebOb==1.8.5
 Werkzeug==0.16.0
 wincertstore==0.2
 gunicorn==19.7.1
-setuptools 42.0.2
+setuptools==42.0.2
