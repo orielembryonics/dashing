@@ -11,12 +11,10 @@ runtime: python37
 # # The settings below are to reduce costs during testing and are not appropriate
 # # for production use. For more information, see:
 # # https://cloud.google.com/appengine/docs/flexible/python/configuring-your-app-with-app-yaml
-manual_scaling:
-  instances: 2
-resources:
-  cpu: 10
-  memory_gb: 64
-  disk_size_gb: 30
+instance_class: B8
+basic_scaling:
+  max_instances: 11
+  idle_timeout: 10m
 
 # readiness_check:
 #   path: "/readiness_check"
