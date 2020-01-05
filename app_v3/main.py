@@ -313,7 +313,7 @@ def update_output(selected_model, slider_value):
 #######################################################################
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(host="0.0.0.0", port=int("80"),debug=True)
     #app.run_server(dev_tools_hot_reload=False)
 
 #######################################################################
